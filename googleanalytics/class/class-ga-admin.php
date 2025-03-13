@@ -12,6 +12,13 @@ use Google\Client;
  */
 class Ga_Admin {
 
+	/**
+	 * GA Token info.
+	 *
+	 * @var array The GA token info.
+	 */
+	public array $token;
+
 	const GA_WEB_PROPERTY_ID_OPTION_NAME                = 'googleanalytics_web_property_id';
 	const GA_EXCLUDE_ROLES_OPTION_NAME                  = 'googleanalytics_exclude_roles';
 	const GA_SHARETHIS_TERMS_OPTION_NAME                = 'googleanalytics_sharethis_terms';

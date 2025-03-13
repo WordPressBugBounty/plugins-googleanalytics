@@ -17,6 +17,10 @@ class Ga_Controller_Core {
 	 * Runs particular action.
 	 */
 	public function handle_actions() {
+		if ( false === current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
 		// Nonce verification happens in verify_nonce function.
 		$action = false === empty( $_REQUEST[ self::ACTION_PARAM_NAME ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ self::ACTION_PARAM_NAME ] ) ) : null; // phpcs:ignore
 
