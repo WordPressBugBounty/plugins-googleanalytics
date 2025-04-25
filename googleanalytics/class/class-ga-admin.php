@@ -939,10 +939,10 @@ class Ga_Admin {
 		};
 
 		if ( Ga_Admin_Controller::validate_ajax_data_change_post() ) {
-			$date_range = filter_input( INPUT_POST, 'date_range', FILTER_SANITIZE_STRING );
-			$metric     = filter_input( INPUT_POST, 'metric', FILTER_SANITIZE_STRING );
+			$date_range = filter_input( INPUT_POST, 'date_range', FILTER_UNSAFE_RAW );
+			$metric     = filter_input( INPUT_POST, 'metric', FILTER_UNSAFE_RAW );
 
-			echo wp_kses_post( Ga_Helper::get_ga_dashboard_widget_data_json( $date_range, $metric, false, true ) );
+			echo wp_kses_post( Ga_Helper::get_ga_dashboard_widget_data_json( sanitize_text_field( wp_unslash( $date_range ) ), sanitize_text_field( wp_unslash( $metric ) ), false, true ) );
 		} else {
 			echo wp_json_encode( array( 'error' => __( 'Invalid request.' ) ) );
 		}
@@ -1194,15 +1194,15 @@ class Ga_Admin {
 			wp_send_json_error( 'user not authorized' );
 		};
 
-		$property = filter_input( INPUT_POST, 'property', FILTER_SANITIZE_STRING );
-		$view_id  = filter_input( INPUT_POST, 'view_id', FILTER_SANITIZE_STRING );
+		$property = filter_input( INPUT_POST, 'property', FILTER_UNSAFE_RAW );
+		$view_id  = filter_input( INPUT_POST, 'view_id', FILTER_UNSAFE_RAW );
 
 		if ( false === empty( $view_id ) ) {
-			update_option( 'googleanalytics-view-id', $view_id );
+			update_option( 'googleanalytics-view-id', sanitize_text_field( wp_unslash( $view_id ) ) );
 		}
 
 		if ( false === empty( $property ) ) {
-			update_option( 'googleanalytics-ga4-property', $property );
+			update_option( 'googleanalytics-ga4-property', sanitize_text_field( wp_unslash( $property ) ) );
 
 			wp_send_json_success( $property );
 		}
@@ -1221,21 +1221,21 @@ class Ga_Admin {
 			wp_send_json_error( 'user not authorized' );
 		};
 
-		$optimize      = 'on' === filter_input(INPUT_POST, 'optimize', FILTER_SANITIZE_STRING);
-		$exclude_roles = filter_input(INPUT_POST, 'exclude_roles', FILTER_SANITIZE_STRING);
-		$enable_demo   = 'on' === filter_input(INPUT_POST, 'enable_demo', FILTER_SANITIZE_STRING);
-		$ip_anon       = 'on' === filter_input(INPUT_POST, 'ip_anon', FILTER_SANITIZE_STRING);
-		$enable_gdpr   = 'on' === filter_input(INPUT_POST, 'enable_gdpr', FILTER_SANITIZE_STRING);
+		$optimize      = 'on' === filter_input( INPUT_POST, 'optimize', FILTER_UNSAFE_RAW );
+		$exclude_roles = filter_input( INPUT_POST, 'exclude_roles', FILTER_UNSAFE_RAW );
+		$enable_demo   = 'on' === filter_input( INPUT_POST, 'enable_demo', FILTER_UNSAFE_RAW );
+		$ip_anon       = 'on' === filter_input( INPUT_POST, 'ip_anon', FILTER_UNSAFE_RAW );
+		$enable_gdpr   = 'on' === filter_input( INPUT_POST, 'enable_gdpr', FILTER_UNSAFE_RAW );
 		$worked        = '';
 
 		if (false === empty($optimize)) {
-			update_option('googleanalytics-ga4-optimize', $optimize);
+			update_option( 'googleanalytics-ga4-optimize', sanitize_text_field( wp_unslash( $optimize ) ) );
 			$worked .= 'optimize worked : ';
 		}
 
 
 		if (false === empty($exclude_roles)) {
-			$exclude_roles = explode(',', $exclude_roles);
+			$exclude_roles       = explode( ',', sanitize_text_field( wp_unslash( $exclude_roles ) ) );
 			$exclude_roles_array = [];
 
 			foreach($exclude_roles as $exclude_role) {
@@ -1285,10 +1285,10 @@ class Ga_Admin {
 			wp_send_json_error( 'user not authorized' );
 		}
 
-		$view_id = filter_input( INPUT_POST, 'view_id', FILTER_SANITIZE_STRING );
+		$view_id = filter_input( INPUT_POST, 'view_id', FILTER_UNSAFE_RAW );
 
 		if ( false === empty( $view_id ) ) {
-			update_option( 'googleanalytics-view-id', $view_id );
+			update_option( 'googleanalytics-view-id', sanitize_text_field( wp_unslash( $view_id ) ) );
 		} else {
 			update_option( 'googleanalytics-view-id', '' );
 		}
@@ -1306,12 +1306,12 @@ class Ga_Admin {
 			wp_send_json_error( 'user not authorized' );
 		};
 
-		$post = filter_input_array( INPUT_POST, FILTER_SANITIZE_STRING );
+		$post = filter_input_array( INPUT_POST, FILTER_UNSAFE_RAW );
 
 		array_walk_recursive(
 			$post['config'],
 			function ( &$value ) {
-				$value = filter_var( trim( $value ), FILTER_SANITIZE_STRING );
+				$value = filter_var( trim( $value ), FILTER_UNSAFE_RAW );
 			}
 		);
 
@@ -1338,9 +1338,9 @@ class Ga_Admin {
 
 		check_ajax_referer( 'ga_demo_nonce', 'nonce' );
 
-		$enabled = 'true' === filter_input( INPUT_POST, 'enabled', FILTER_SANITIZE_STRING );
+		$enabled = 'true' === filter_input( INPUT_POST, 'enabled', FILTER_UNSAFE_RAW );
 
-		update_option( 'googleanalytics_demographic', $enabled );
+		update_option( 'googleanalytics_demographic', sanitize_text_field( wp_unslash( $enabled ) ) );
 		update_option( 'googleanalytics-ga4-demo', 'on' );
 
 		wp_send_json_success( 'demo_on' );
@@ -1401,9 +1401,9 @@ class Ga_Admin {
 
 		check_ajax_referer( 'googleanalyticsnonce', 'nonce' );
 
-		$property_id = filter_input( INPUT_POST, 'propid', FILTER_SANITIZE_STRING );
+		$property_id = filter_input( INPUT_POST, 'propid', FILTER_UNSAFE_RAW );
 
-		$secret = filter_input( INPUT_POST, 'secret', FILTER_SANITIZE_STRING );
+		$secret = filter_input( INPUT_POST, 'secret', FILTER_UNSAFE_RAW );
 
 		if ( true === empty( $property_id ) || true === empty( $secret ) ) {
 			wp_send_json_error( 'Set credentials failed.' );
