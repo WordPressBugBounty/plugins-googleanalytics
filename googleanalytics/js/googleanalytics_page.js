@@ -176,6 +176,7 @@ const GA_AUTHENTICATION_CODE_ERROR = 'That looks like your Google Analytics Trac
 						} else {
 							var dataObj = {};
 							dataObj['action'] = "save_ga4_property_selection";
+							dataObj['nonce'] = GA_NONCE;
 							dataObj['property'] = propertySelection.value;
 							dataObj['view_id'] = propertySelection.item(propertySelection.selectedIndex).getAttribute( 'data-view-id' );
 
@@ -250,6 +251,7 @@ const GA_AUTHENTICATION_CODE_ERROR = 'That looks like your Google Analytics Trac
 					finalDataObj['exclude_roles'] = excludeSelections;
 					finalDataObj['enable_demo'] = enableDemo ? enableDemo.checked : false;
 					finalDataObj['ip_anon'] = ipAnon ? ipAnon.checked : false;
+					finalDataObj['nonce'] = GA_NONCE;
 					finalDataObj['enable_gdpr'] = enableGdpr ? enableGdpr.checked : false;
 
 					$.ajax(
@@ -283,6 +285,7 @@ const GA_AUTHENTICATION_CODE_ERROR = 'That looks like your Google Analytics Trac
 					const viewID = propSelect.item( propSelect.selectedIndex ).getAttribute( 'data-view-id' );
 
 					viewIdDataObj['action'] = "save_view_id";
+					viewIdDataObj['nonce'] = GA_NONCE;
 					viewIdDataObj['view_id'] = viewID;
 
 					$.ajax(
@@ -566,7 +569,7 @@ const GA_AUTHENTICATION_CODE_ERROR = 'That looks like your Google Analytics Trac
 			);
 
 			dataObj['action'] = "ga_ajax_enable_gdpr";
-			dataObj['nonce']  = 'true';
+			dataObj['nonce']  = GA_NONCE;
 			dataObj['config'] = config;
 
 			$.ajax(

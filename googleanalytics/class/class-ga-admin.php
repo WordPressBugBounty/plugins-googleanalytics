@@ -1190,7 +1190,7 @@ class Ga_Admin {
 	 * @return void
 	 */
 	public static function save_ga4_property_selection() {
-		if ( false === current_user_can( 'manage_options' ) ) {
+		if ( check_ajax_referer( 'ga4-setup', 'nonce' ) && false === current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( 'user not authorized' );
 		};
 
@@ -1217,7 +1217,7 @@ class Ga_Admin {
 	 */
 	public static function save_ga4_final_setup()
 	{
-		if ( false === current_user_can( 'manage_options' ) ) {
+		if ( check_ajax_referer( 'ga4-setup', 'nonce' ) && false === current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( 'user not authorized' );
 		};
 
@@ -1281,7 +1281,7 @@ class Ga_Admin {
 	 * @return void
 	 */
 	public static function save_view_id() {
-		if ( false === current_user_can( 'manage_options' ) ) {
+		if ( check_ajax_referer( 'ga4-setup', 'nonce' ) && false === current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( 'user not authorized' );
 		}
 
@@ -1302,7 +1302,7 @@ class Ga_Admin {
 	 * @return void
 	 */
 	public static function ga_ajax_gdpr_enable( $post ) {
-		if ( false === current_user_can( 'manage_options' ) ) {
+		if ( check_ajax_referer( 'ga4-setup', 'nonce' ) && false === current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( 'user not authorized' );
 		};
 
