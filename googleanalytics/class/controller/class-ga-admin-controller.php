@@ -49,14 +49,14 @@ class Ga_Admin_Controller extends Ga_Controller_Core {
 					$msg = Ga_Helper::create_url_msg( $msg, Ga_Admin::NOTICE_ERROR );
 				} else {
 					$msg = Ga_Helper::create_url_msg(
-						__( 'An invite was sent to this email' ),
+						__( 'An invite was sent to this email', 'googleanalytics' ),
 						Ga_Admin::NOTICE_SUCCESS
 					);
 				}
 			}
 		} else {
 			$msg = Ga_Helper::create_url_msg(
-				__( 'Invalid request.' ),
+				__( 'Invalid request.', 'googleanalytics' ),
 				Ga_Admin::NOTICE_ERROR
 			);
 		}

@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 /**
  * GA Support Logger class.
  */
@@ -221,7 +223,7 @@ class Ga_SupportLogger {
 			/* translators: %s refers to the value of the message. */
 			$formatted[] = esc_html__(
 				$text . sprintf( ': %s', $value ) // phpcs:ignore
-			);
+				, 'googleanalytics');
 		}
 
 		return $formatted;

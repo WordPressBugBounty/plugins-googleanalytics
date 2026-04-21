@@ -117,7 +117,7 @@ class Ga_Lib_Api_Request {
 				// Check if the next request after error is allowed.
 				if ( false === Ga_Cache::is_next_request_allowed( $wp_transient_name ) ) {
 					throw new Ga_Lib_Api_Client_Exception(
-						__( 'There are temporary connection issues, please try again later.' )
+						esc_html__( 'There are temporary connection issues, please try again later.', 'googleanalytics' )
 					);
 				}
 			}
@@ -125,7 +125,7 @@ class Ga_Lib_Api_Request {
 
 		if ( false === function_exists( 'curl_init' ) ) {
 			throw new Ga_Lib_Api_Client_Exception(
-				__( 'cURL functions are not available' )
+				esc_html__( 'cURL functions are not available', 'googleanalytics' )
 			);
 		}
 
@@ -207,7 +207,7 @@ class Ga_Lib_Api_Request {
 				Ga_Cache::set_last_time_attempt();
 			}
 
-			throw new Ga_Lib_Api_Client_Exception( $error . ' (' . $errno . ')' );
+			throw new Ga_Lib_Api_Client_Exception( esc_html($error) . ' (' . esc_html($errno) . ')' );
 		} else {
 			$http_code   = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
 			$header_size = curl_getinfo( $ch, CURLINFO_HEADER_SIZE );
@@ -218,9 +218,9 @@ class Ga_Lib_Api_Request {
 				throw new Ga_Lib_Api_Request_Exception(
 					404 === $http_code ? sprintf(
 						/* translators: %s stands for the URL. */
-						__( 'Requested URL doesn\'t exists: %s', 'googleanalytics' ),
-						$url
-					) : $body
+						esc_html__( 'Requested URL doesn\'t exists: %s', 'googleanalytics' ),
+						esc_url($url)
+					) : wp_kses_post($body)
 				);
 			}
 

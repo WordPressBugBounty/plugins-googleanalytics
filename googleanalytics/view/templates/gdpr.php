@@ -5,6 +5,7 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
 ?>
 <?php if ( true === empty( $gdpr_config ) ) : ?>
 	<tr>
@@ -13,12 +14,12 @@
 	<tr>
 		<?php if ( true === Ga_Helper::are_features_enabled() ) : ?>
 			<td>
-				<button class="gdpr-enable"><?php esc_html_e( 'Enable' ); ?></button>
+				<button class="gdpr-enable"><?php esc_html_e( 'Enable', 'googleanalytics' ); ?></button>
 			</td>
 		<?php else : ?>
 			<td>
 				<label class="<?php echo esc_attr( false === Ga_Helper::are_features_enabled() ? 'label-grey ga-tooltip' : '' ); ?>">
-					<button class="gdpr-enable" disabled="disabled"><?php esc_html_e( 'Enable' ); ?></button>
+					<button class="gdpr-enable" disabled="disabled"><?php esc_html_e( 'Enable', 'googleanalytics' ); ?></button>
 					<span class="ga-tooltiptext ga-tt-abs"><?php echo esc_html( $tooltip ); ?></span>
 				</label>
 			</td>

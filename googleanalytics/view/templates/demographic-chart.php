@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 ?>
 <?php if ( false === $demo_enabled ) : ?>
 	<div class="demo-ad ga-panel ga-panel-default">
@@ -70,7 +72,7 @@
 	<div class="demo-ad ga-panel ga-panel-default">
 		<div class="ga-panel-heading">
 			<strong>
-				<?php esc_html_e( 'Demographic by sessions' ); ?>
+				<?php esc_html_e( 'Demographic by sessions', 'googleanalytics' ); ?>
 			</strong>
 		</div>
 		<div class="ga-demo-chart">

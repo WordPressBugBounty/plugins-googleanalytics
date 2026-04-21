@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 $debug_mode_on = isset( $debug_mode_on ) ? $debug_mode_on : false;
 
 $script = ( true === $debug_mode_on ) ?

@@ -5,6 +5,7 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
 ?>
 <h3>
 	<?php esc_html_e( 'WHY ARE YOU COLLECTING CUSTOMER DATA?', 'googleanalytics' ); ?>

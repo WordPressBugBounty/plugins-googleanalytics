@@ -115,7 +115,7 @@ class Ga_Lib_Google_Api_Client extends Ga_Lib_Api_Client {
 					return call_user_func( $callback );
 				}
 			} catch ( Ga_Lib_Api_Request_Exception $e ) {
-				throw new Ga_Lib_Google_Api_Client_Exception( $e->getMessage() );
+				throw new Ga_Lib_Google_Api_Client_Exception( esc_html($e->getMessage()) );
 			}
 		} else {
 			throw new Ga_Lib_Google_Api_Client_Exception(
@@ -187,7 +187,7 @@ class Ga_Lib_Google_Api_Client extends Ga_Lib_Api_Client {
 				true
 			);
 		} catch ( Ga_Lib_Api_Request_Exception $e ) {
-			throw new Ga_Lib_Google_Api_Client_AuthCode_Exception( $e->getMessage() );
+			throw new Ga_Lib_Google_Api_Client_AuthCode_Exception( esc_html($e->getMessage()) );
 		}
 
 		return new Ga_Lib_Api_Response( $response );
@@ -217,7 +217,7 @@ class Ga_Lib_Google_Api_Client extends Ga_Lib_Api_Client {
 				true
 			);
 		} catch ( Ga_Lib_Api_Request_Exception $e ) {
-			throw new Ga_Lib_Google_Api_Client_RefreshToken_Exception( $e->getMessage() );
+			throw new Ga_Lib_Google_Api_Client_RefreshToken_Exception( esc_html($e->getMessage()) );
 		}
 
 		return new Ga_Lib_Api_Response( $response );
@@ -235,7 +235,7 @@ class Ga_Lib_Google_Api_Client extends Ga_Lib_Api_Client {
 		try {
 			$response = $request->make_request( self::GA_ACCOUNT_SUMMARIES_ENDPOINT, null, false, true );
 		} catch ( Ga_Lib_Api_Request_Exception $e ) {
-			throw new Ga_Lib_Google_Api_Client_AccountSummaries_Exception( $e->getMessage() );
+			throw new Ga_Lib_Google_Api_Client_AccountSummaries_Exception( esc_html($e->getMessage()) );
 		}
 
 		return new Ga_Lib_Api_Response( $response );
@@ -270,7 +270,7 @@ class Ga_Lib_Google_Api_Client extends Ga_Lib_Api_Client {
 			);
 
 		} catch ( Ga_Lib_Api_Request_Exception $e ) {
-			throw new Ga_Lib_Google_Api_Client_Data_Exception( $e->getMessage() );
+			throw new Ga_Lib_Google_Api_Client_Data_Exception( esc_html($e->getMessage()) );
 		}
 
 		return new Ga_Lib_Api_Response( $response );
@@ -373,7 +373,7 @@ class Ga_Lib_Google_Api_Client extends Ga_Lib_Api_Client {
 			} else {
 				if ( true === empty( $this->token['refresh_token'] ) ) {
 					throw new Ga_Lib_Api_Client_Exception(
-						__( 'Refresh token is not available. Please re-authenticate.' )
+						esc_html__( 'Refresh token is not available. Please re-authenticate.', 'googleanalytics' )
 					);
 				} else {
 					$this->refresh_access_token( $this->token['refresh_token'] );

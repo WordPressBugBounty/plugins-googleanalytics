@@ -135,25 +135,6 @@ const GA_AUTHENTICATION_CODE_ERROR = 'That looks like your Google Analytics Trac
 				} );
 			}
 
-			// Google auto popup.
-			const googleAuthLinks = document.querySelectorAll( '#google-auth-link, #ga_authorize_with_google_button' );
-			const theURL = btoa( window.location.href );
-
-			if ( googleAuthLinks ) {
-				googleAuthLinks.forEach( googleAuthLink => {
-					const theHref = btoa( googleAuthLink.getAttribute( 'href' ) );
-
-					googleAuthLink.addEventListener( 'click', ( e ) => {
-						e.preventDefault();
-						e.stopPropagation();
-
-						const uaAddition = 'ga_authorize_with_google_button' === e.target.id ? '&ua=t' : '';
-
-						window.location.href = 'https://sharethis.com/google-analytics-setup/?rfrurlga=' + theURL + '&rfgurlga=' + theHref + uaAddition;
-					} );
-				} );
-			}
-
 			// To step 3.
 			const nextButton = document.getElementById( 'to-step-3' );
 

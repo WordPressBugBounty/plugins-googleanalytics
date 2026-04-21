@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 $args = isset( $args ) ? $args : array();
 
 $props = wp_parse_args(

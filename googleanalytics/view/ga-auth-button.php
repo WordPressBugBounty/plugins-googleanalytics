@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 // Template partial fallback values.
 $label       = isset( $label ) ? $label : '';
 $manually_id = isset( $manually_id ) ? $manually_id : '';

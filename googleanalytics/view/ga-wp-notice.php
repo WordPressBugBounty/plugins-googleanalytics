@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 $is_dismissable = isset( $is_dismissable ) ? $is_dismissable : false;
 
 $msg = isset( $msg ) ? $msg : '';

@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 // Template vars.
 $colors = array(
 	'#e31010',
@@ -131,7 +133,7 @@ $enabled        = ! empty( $gdpr_config['enabled'] ) ? $gdpr_config['enabled'] :
 	<div class="accor-wrap">
 		<div class="accor-tab">
 			<span class="accor-arrow">&#9658;</span>
-			<?php esc_html_e( 'Appearance', 'simple-share-buttons-adder' ); ?>
+			<?php esc_html_e( 'Appearance', 'googleanalytics' ); ?>
 		</div>
 		<div class="accor-content">
 			<div class="well">
@@ -142,7 +144,7 @@ $enabled        = ! empty( $gdpr_config['enabled'] ) ? $gdpr_config['enabled'] :
 	<div class="accor-wrap">
 		<div class="accor-tab">
 			<span class="accor-arrow">&#9658;</span>
-			<?php esc_html_e( 'Purposes', 'simple-share-buttons-adder' ); ?>
+			<?php esc_html_e( 'Purposes', 'googleanalytics' ); ?>
 		</div>
 		<div class="accor-content">
 			<div class="well">

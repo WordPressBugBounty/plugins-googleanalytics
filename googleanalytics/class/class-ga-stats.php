@@ -32,6 +32,61 @@ class Ga_Stats {
 	}
 
 	/**
+	 * Run a GA4 report over REST using the broker-backed access token.
+	 *
+	 * @param string $property_id GA4 property name or ID. Accepts "properties/123" or "123".
+	 * @param array  $body        RunReport body.
+	 * @return array
+	 */
+	public function ga4_run_report_rest( $property_id, array $body ) {
+		$ga_admin = new Ga_Admin();
+		$client   = $ga_admin->getGa4Client();
+		$token    = $client->getAccessToken();
+
+		if ( ! is_array( $token ) || empty( $token['access_token'] ) ) {
+			return array();
+		}
+
+		$access_token = sanitize_text_field( (string) $token['access_token'] );
+
+		$property_path = (string) $property_id;
+		if ( 0 !== strpos( $property_path, 'properties/' ) ) {
+			$property_path = 'properties/' . $property_path;
+		}
+
+		$url = sprintf(
+			'https://analyticsdata.googleapis.com/v1beta/%s:runReport',
+			$property_path
+		);
+
+		$response = wp_remote_post(
+			$url,
+			array(
+				'timeout' => 20,
+				'headers' => array(
+					'Authorization' => 'Bearer ' . $access_token,
+					'Content-Type'  => 'application/json',
+				),
+				'body' => wp_json_encode( $body, JSON_UNESCAPED_SLASHES ),
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return array();
+		}
+
+		$status_code = wp_remote_retrieve_response_code( $response );
+		$response_body = wp_remote_retrieve_body( $response );
+		$data = json_decode( $response_body, true );
+
+		if ( 200 !== $status_code || ! is_array( $data ) ) {
+			return array();
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Preparing query to get Analytics data
 	 *
 	 * @param string $query      Query type.

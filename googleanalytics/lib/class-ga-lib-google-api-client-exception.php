@@ -69,7 +69,7 @@ class Ga_Lib_Google_Api_Client_Exception extends Ga_Lib_Api_Client_Exception {
 	 */
 	protected function get_error_response_data( $response ) {
 		$data = json_decode( $response, true );
-		if ( is_array( $data['error'] ) && ! empty( $data['error'] ) && ! empty( $data['error']['message'] ) && ! empty( $data['error']['code'] ) ) {
+		if ( ! empty( $data['error'] ) && is_array( $data['error'] ) && ! empty( $data['error']['message'] ) && ! empty( $data['error']['code'] ) ) {
 			return $data;
 		} elseif ( ! empty( $data['error'] ) ) {
 			return array(
@@ -81,7 +81,7 @@ class Ga_Lib_Google_Api_Client_Exception extends Ga_Lib_Api_Client_Exception {
 		} else {
 			return array(
 				'error' => array(
-					'message' => __( 'Google Reporting API - unknown error.' ),
+					'message' => __( 'Google Reporting API - unknown error.', 'googleanalytics' ),
 					'code'    => 500,
 				),
 			);

@@ -43,7 +43,7 @@ class Ga_Notice {
 			$message = Ga_Helper::ga_wp_notice( $error['message'], 'warning' );
 		} else {
 			$message = Ga_Helper::ga_wp_notice(
-				__( 'There are temporary connection issues, please try again later or go to Google Analytics website to see the dashboards' ),
+				__( 'There are temporary connection issues, please try again later or go to Google Analytics website to see the dashboards', 'googleanalytics' ),
 				'error'
 			);
 		}

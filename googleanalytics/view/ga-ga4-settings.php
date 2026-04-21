@@ -1,7 +1,10 @@
 <?php
+if (!defined('ABSPATH')) exit;
+
 $ga4_exclude_roles = true === is_array( $ga4_exclude_roles ) ? $ga4_exclude_roles : array();
 $ga_admin          = new Ga_Admin();
 $auth_info         = $ga_admin->getGa4AuthInfo();
+$oauth             = new GA_OAuth();
 ?>
 <script type="text/javascript">
 	const GA_NONCE = '<?php echo esc_js( $ga_nonce ); ?>';
@@ -15,7 +18,7 @@ $auth_info         = $ga_admin->getGa4AuthInfo();
 		</div>
 		<h2>Setup Google Authentication</h2>
 		<p>Use our configuration wizard to properly setup Google Analytics with WordPress (with just a few clicks).</p>
-		<a id="google-auth-link" href="<?php echo esc_url( $auth_info['auth_url'] ); ?>">
+		<a id="google-auth-link" href="<?php echo esc_url( $oauth->get_connect_url() ); ?>">
 			<img src="<?php echo esc_url( plugins_url() ) . '/googleanalytics/assets/images/Google-logo.svg'; ?>" alt="Google Logo">Sign in with Google
 		</a>
 	</div>
@@ -153,7 +156,7 @@ $auth_info         = $ga_admin->getGa4AuthInfo();
 				<?php if ( false === empty( $data['popup_url'] ) ) : ?>
 					<th scope="row">
 						<label class="<?php echo esc_attr( false === Ga_Helper::are_features_enabled() ? 'label-grey ga-tooltip"' : '' ); ?>">
-							<?php esc_html_e( 'Google Profile' ); ?>:
+							<?php esc_html_e( 'Google Profile', 'googleanalytics' ); ?>:
 							<span class="ga-tooltiptext ga-tt-abs"><?php echo esc_html( $tooltip ); ?></span>
 						</label>
 					</th>
@@ -201,7 +204,7 @@ $auth_info         = $ga_admin->getGa4AuthInfo();
 			<tr id="ga_roles_wrapper">
 				<th scope="row">
 					<label class="<?php echo esc_attr( false === Ga_Helper::are_features_enabled() ? 'label-grey ga-tooltip' : '' ); ?>">
-						<?php esc_html_e( 'Exclude Tracking for Roles' ); ?>
+						<?php esc_html_e( 'Exclude Tracking for Roles', 'googleanalytics' ); ?>
 						:
 						<span class="ga-tooltiptext ga-tt-abs"><?php echo esc_html( $tooltip ); ?></span>
 					</label>
@@ -235,7 +238,7 @@ $auth_info         = $ga_admin->getGa4AuthInfo();
 				</td>
 			</tr>
 			<tr>
-				<th scope="row"><?php esc_html_e( 'Enable IP Anonymization' ); ?>:</th>
+				<th scope="row"><?php esc_html_e( 'Enable IP Anonymization', 'googleanalytics' ); ?>:</th>
 			</tr>
 			<tr>
 				<td>
@@ -283,7 +286,7 @@ $auth_info         = $ga_admin->getGa4AuthInfo();
 		</table>
 
 		<p class="submit">
-			<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save Changes' ); ?>"/>
+			<input type="submit" class="button-primary" value="<?php esc_html_e( 'Save Changes', 'googleanalytics' ); ?>"/>
 		</p>
 	</form>
 </div>

@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 ?>
 <div class="demo-enable-popup">
 	<p>

@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 $enabledisable = get_option( 'googleanalytics_demographic' ) === '1' ? 'Disable' : 'Enable';
 ?>
 <?php if ( 'Enable' === $enabledisable ) : ?>
@@ -18,7 +20,7 @@ $enabledisable = get_option( 'googleanalytics_demographic' ) === '1' ? 'Disable'
 	<?php else : ?>
 		<td>
 			<label class="<?php echo false === Ga_Helper::are_features_enabled() ? 'label-grey ga-tooltip' : ''; ?>">
-				<button class="gdpr-enable" disabled="disabled"><?php esc_html_e( 'Enable' ); ?></button>
+				<button class="gdpr-enable" disabled="disabled"><?php esc_html_e( 'Enable', 'googleanalytics' ); ?></button>
 				<span class="ga-tooltiptext ga-tt-abs"><?php echo esc_html( $tooltip ); ?></span>
 			</label>
 		</td>

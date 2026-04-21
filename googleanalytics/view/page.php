@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 $optimize_code = get_option( 'googleanalytics_optimize_code' );
 $universal          = get_option( 'googleanalytics_enable_universal_analytics', true );
 $anonymization = get_option( 'googleanalytics_ip_anonymization', true );
@@ -13,8 +15,8 @@ $gdpr_config   = get_option( 'googleanalytics_gdpr_config' );
 $sharethis_property = get_option( 'googleanalytics_sharethis_terms' );
 $plugin_dir    = plugin_dir_path( __FILE__ );
 $plugin_uri    = trailingslashit( get_home_url() ) . 'wp-content/plugins/googleanalytics/';
-$has_code = filter_input(INPUT_GET, 'code');
-$has_code = isset($has_code) ? $has_code : false;
+$has_code = filter_input(INPUT_GET, 'ga_connected');
+$has_code = isset($has_code);
 $is_ua              = filter_input( INPUT_GET, 'ua' );
 $is_ua              = true === isset( $is_ua ) ? 't' === $is_ua : false;
 $has_property = get_option('googleanalytics-ga4-property');
@@ -58,8 +60,8 @@ $setup_done = false !== $has_property &&
 			}
 		}
 		?>
-		<p class="ga-love-text"><?php esc_html_e( 'Love this plugin?' ); ?> <a
-					href="https://wordpress.org/support/plugin/googleanalytics/reviews/#new-post"><?php esc_html_e( ' Please help spread the word by leaving a 5-star review!' ); ?> </a>
+		<p class="ga-love-text"><?php esc_html_e( 'Love this plugin?', 'googleanalytics' ); ?> <a
+					href="https://wordpress.org/support/plugin/googleanalytics/reviews/#new-post"><?php esc_html_e( ' Please help spread the word by leaving a 5-star review!', 'googleanalytics'); ?> </a>
 		</p>
 	</div>
 	<script type="text/javascript">

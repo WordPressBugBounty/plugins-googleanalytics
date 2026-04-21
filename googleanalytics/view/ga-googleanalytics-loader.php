@@ -5,6 +5,7 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
 ?>
 <script>
 	jQuery(document).ready(function () {

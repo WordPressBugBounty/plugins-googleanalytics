@@ -3,12 +3,16 @@
  * Plugin Name: ShareThis Dashboard for Google Analytics
  * Plugin URI: http://wordpress.org/extend/plugins/googleanalytics/
  * Description: Use Google Analytics on your WordPress site without touching any code, and view visitor reports right in your WordPress admin dashboard!
- * Version: 3.2.4
+ * Version: 3.3.0
  * Author: ShareThis
  * Author URI: http://sharethis.com
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
  * @package GoogleAnalytics
  */
+
+if (!defined('ABSPATH')) exit;
 
 if ( ! defined( 'WP_CONTENT_URL' ) ) {
 	define( 'WP_CONTENT_URL', get_option( 'siteurl' ) . '/wp-content' );
@@ -18,6 +22,9 @@ if ( ! defined( 'WP_CONTENT_DIR' ) ) {
 }
 if ( ! defined( 'WP_PLUGIN_URL' ) ) {
 	define( 'WP_PLUGIN_URL', WP_CONTENT_URL . '/plugins' );
+}
+if ( ! defined( 'SHARETHIS_GA_BROKER_BASE' ) ) {
+	define( 'SHARETHIS_GA_BROKER_BASE', 'https://platform-api.sharethis.com/v2.0/googlewp/' );
 }
 if ( ! defined( 'WP_PLUGIN_DIR' ) ) {
 	define( 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins' );
@@ -49,7 +56,7 @@ if ( false === preg_match( '/(\/|\\\)' . GA_NAME . '(\/|\\\)/', realpath( __FILE
 		sprintf(
 		/* translators: %s refers to the Google Analytics directory name. */
 			__(
-				'Invalid plugin installation directory. Please verify if the plugin\'s dir name is equal to "%s".'
+				'Invalid plugin installation directory. Please verify if the plugin\'s dir name is equal to "%s".', 'googleanalytics'
 			),
 			esc_attr( GA_NAME )
 		)
@@ -59,7 +66,7 @@ if ( false === preg_match( '/(\/|\\\)' . GA_NAME . '(\/|\\\)/', realpath( __FILE
 	die();
 }
 
-const GOOGLEANALYTICS_VERSION = '3.2.4';
+const GOOGLEANALYTICS_VERSION = '3.3.0';
 
 // Requires.
 require_once GA_PLUGIN_DIR . '/lib/analytics-admin/vendor/autoload.php';
@@ -67,13 +74,19 @@ require_once GA_PLUGIN_DIR . '/overwrite/ga-overwrite.php';
 require_once GA_PLUGIN_DIR . '/class/class-ga-autoloader.php';
 require_once GA_PLUGIN_DIR . '/class/class-ga-autoloader.php';
 require_once GA_PLUGIN_DIR . '/tools/class-ga-supportlogger.php';
+require_once GA_PLUGIN_DIR . '/class/class-ga-oauth.php';
 
 if ( version_compare( phpversion(), '7.4', '>=' ) ) {
     Ga_Autoloader::register();
     Ga_Hook::add_hooks( GA_MAIN_FILE_PATH );
 
-    add_action( 'plugins_loaded', 'Ga_Admin::loaded_googleanalytics' );
+	add_action( 'plugins_loaded', 'Ga_Admin::loaded_googleanalytics' );
     add_action( 'init', 'Ga_Helper::init' );
+
+	add_action( 'plugins_loaded', function() {
+		$sharethis_ga_oauth = new GA_OAuth();
+		$sharethis_ga_oauth->hooks();
+	} );
 } else {
     if ( defined( 'WP_CLI' ) ) {
         WP_CLI::warning( _google_analytics_php_version_text() );
@@ -88,7 +101,7 @@ if ( version_compare( phpversion(), '7.4', '>=' ) ) {
  * @return string
  */
 function _google_analytics_php_version_text() {
-    return __( 'ShareThis Dashboard for Google Analytics plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 7.4 or higher.', 'googlanalytics' );
+    return __( 'ShareThis Dashboard for Google Analytics plugin error: Your version of PHP is too old to run this plugin. You must be running PHP 7.4 or higher.', 'googleanalytics' );
 }
 
 

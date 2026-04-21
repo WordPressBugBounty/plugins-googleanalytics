@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 $url = isset( $url ) ? $url : '';
 ?>
 <div style="display: none" id="googleanalytics_terms_notice"

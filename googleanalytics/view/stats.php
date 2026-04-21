@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 // Variables passed in (with fallbacks in case they aren't).
 $age_chart    = true === isset( $age_chart ) ? $age_chart : array();
 $gender_chart = true === isset( $gender_chart ) ? $gender_chart : array();
@@ -22,7 +24,8 @@ $client           = $client->getGa4Client();
 $token_response   = $client->getAccessToken();
 $client_stuff     = (array) $client;
 $client_obj       = array_values( $client_stuff )[4];
-$ga4_demo_enabled = 'on' === get_option( 'googleanalytics-ga4-demo' );
+$ga4_demo_enabled = get_option( 'googleanalytics-ga4-demo' );
+$ga4_demo_enabled = '1' === $ga4_demo_enabled || 'on' === $ga4_demo_enabled ? true : false;
 $ga4_property     = get_option( 'googleanalytics-ga4-property' );
 $ga4_property     = true === isset( $ga4_property ) ? $ga4_property : false;
 $internal_prop    = $ga4_property;
@@ -68,7 +71,7 @@ $days_in_english = Ga_Helper::get_period_in_days_words( $date_range['from'], $da
 if ( false === $demo_enabled && false === $ga4_demo_enabled ) {
 	echo wp_kses(
 		Ga_Helper::ga_wp_notice(
-			__( 'Visualize gender and age data with our new demographic feature.' ),
+			__( 'Visualize gender and age data with our new demographic feature.', 'googleanalytics' ),
 			'warning',
 			false,
 			array(

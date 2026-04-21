@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 // Set add_manually_enabled fallback.
 $add_manually_enabled = isset( $add_manually_enabled ) ? $add_manually_enabled : false;
 

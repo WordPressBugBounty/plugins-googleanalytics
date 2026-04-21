@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 use Google\Client;
 
 /**
@@ -116,7 +118,7 @@ class Ga_Admin {
 		delete_option( 'googleanalytics_sharethis_terms' );
 		delete_option( 'googleanalytics_sherethis_property_id' );
 		delete_option( 'googleanalytics_sherethis_property_secret' );
-
+		delete_option( 'sharethis_ga_refresh_token' );
 		delete_option( 'googleanalytics-ga4-gdpr' );
 		delete_option( 'googleanalytics-ga4-ip-anon' );
 		delete_option( 'googleanalytics-ga4-demo' );
@@ -268,27 +270,172 @@ class Ga_Admin {
 	 * Registers plugin's settings.
 	 */
 	public static function admin_init_googleanalytics() {
-		register_setting( GA_NAME, self::GA_WEB_PROPERTY_ID_OPTION_NAME );
-		register_setting( GA_NAME, self::GA_EXCLUDE_ROLES_OPTION_NAME );
-		register_setting( GA_NAME, self::GA_SELECTED_ACCOUNT );
-		register_setting( GA_NAME, self::GA_OAUTH_AUTH_CODE_OPTION_NAME );
-		register_setting( GA_NAME, self::GA_WEB_PROPERTY_ID_MANUALLY_OPTION_NAME );
-		register_setting( GA_NAME, self::GA_WEB_PROPERTY_ID_MANUALLY_VALUE_OPTION_NAME );
-		register_setting( GA_NAME, self::GA_DISABLE_ALL_FEATURES );
-		register_setting( GA_NAME, 'googleanalytics_optimize_code' );
-		register_setting( GA_NAME, 'googleanalytics_ip_anonymization' );
-		register_setting( GA_NAME, 'googleanalytics_enable_debug_mode' );
-		register_setting( GA_NAME . 'ga4', 'googleanalytics-ga4-property' );
-		register_setting( GA_NAME . 'ga4', 'googleanalytics-ga4-optimize' );
-		register_setting( GA_NAME . 'ga4', 'googleanalytics-ga4-exclude-roles' );
-		register_setting( GA_NAME . 'ga4', 'googleanalytics-ga4-demo' );
-		register_setting( GA_NAME . 'ga4', 'googleanalytics-ga4-ip-anon' );
-		register_setting( GA_NAME . 'ga4', 'googleanalytics-ga4-gdpr' );
-		add_filter( 'pre_update_option_' . self::GA_EXCLUDE_ROLES_OPTION_NAME, 'Ga_Admin::preupdate_exclude_roles', 1, 2 );
-		add_filter( 'pre_update_option_' . self::GA_SELECTED_ACCOUNT, 'GA_Admin::preupdate_selected_account', 1, 2 );
-		add_filter( 'pre_update_option_googleanalytics_optimize_code', 'Ga_Admin::preupdate_optimize_code', 1, 2 );
-		add_filter( 'pre_update_option_googleanalytics_ip_anonymization', 'Ga_Admin::preupdate_ip_anonymization', 1, 2 );
-		add_filter( 'pre_update_option_googleanalytics_enable_debug_mode', 'Ga_Admin::preupdate_enable_debug_mode', 1, 2 );
+		register_setting(
+			GA_NAME,
+			self::GA_WEB_PROPERTY_ID_OPTION_NAME,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+
+		register_setting(
+			GA_NAME,
+			self::GA_EXCLUDE_ROLES_OPTION_NAME,
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_roles_option' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME,
+			self::GA_SELECTED_ACCOUNT,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_selected_account' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME,
+			self::GA_OAUTH_AUTH_CODE_OPTION_NAME,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+
+		register_setting(
+			GA_NAME,
+			self::GA_WEB_PROPERTY_ID_MANUALLY_OPTION_NAME,
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME,
+			self::GA_WEB_PROPERTY_ID_MANUALLY_VALUE_OPTION_NAME,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+
+		register_setting(
+			GA_NAME,
+			self::GA_DISABLE_ALL_FEATURES,
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME,
+			'googleanalytics_optimize_code',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME,
+			'googleanalytics_ip_anonymization',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME,
+			'googleanalytics_enable_debug_mode',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME . 'ga4',
+			'googleanalytics-ga4-property',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+
+		register_setting(
+			GA_NAME . 'ga4',
+			'googleanalytics-ga4-optimize',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME . 'ga4',
+			'googleanalytics-ga4-exclude-roles',
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_roles_option' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME . 'ga4',
+			'googleanalytics-ga4-demo',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME . 'ga4',
+			'googleanalytics-ga4-ip-anon',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+			)
+		);
+
+		register_setting(
+			GA_NAME . 'ga4',
+			'googleanalytics-ga4-gdpr',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_checkbox' ),
+			)
+		);
+	}
+
+	public static function sanitize_checkbox( $value ) {
+		return ! empty( $value ) ? 1 : 0;
+	}
+
+	public static function sanitize_roles_option( $value ) {
+		if ( ! is_array( $value ) ) {
+			return array();
+		}
+
+		$value = array_map( 'sanitize_key', $value );
+		$value = array_filter( $value );
+
+		return array_values( array_unique( $value ) );
+	}
+
+	public static function sanitize_selected_account( $value ) {
+		if ( is_array( $value ) ) {
+			return array_map( 'sanitize_text_field', wp_unslash( $value ) );
+		}
+
+		return sanitize_text_field( wp_unslash( $value ) );
 	}
 
 	/**
@@ -299,14 +446,14 @@ class Ga_Admin {
 
 		if ( current_user_can( 'manage_options' ) ) {
 			add_menu_page( 'Google Analytics', 'Google Analytics', 'manage_options', 'googleanalytics', 'Ga_Admin::statistics_page_googleanalytics', 'dashicons-chart-line', 1000 );
-			add_submenu_page( 'googleanalytics', 'Google Analytics', __( 'Dashboard' ), 'manage_options', 'googleanalytics', 'Ga_Admin::statistics_page_googleanalytics' );
-			add_submenu_page( 'googleanalytics', 'Google Analytics', __( 'Settings' ), 'manage_options', 'googleanalytics/settings', 'Ga_Admin::options_page_googleanalytics' );
+			add_submenu_page( 'googleanalytics', 'Google Analytics', __( 'Dashboard', 'googleanalytics' ), 'manage_options', 'googleanalytics', 'Ga_Admin::statistics_page_googleanalytics' );
+			add_submenu_page( 'googleanalytics', 'Google Analytics', __( 'Settings', 'googleanalytics' ), 'manage_options', 'googleanalytics/settings', 'Ga_Admin::options_page_googleanalytics' );
 
 			if ( ! empty( $gdpr ) ) {
 				add_submenu_page(
 					'googleanalytics',
 					'Google Analytics',
-					__( 'GDPR' ),
+					__( 'GDPR', 'googleanalytics' ),
 					'manage_options',
 					'googleanalytics/gdpr',
 					'Ga_Admin::gdpr_page_googleanalytics'
@@ -347,7 +494,7 @@ class Ga_Admin {
 			echo wp_kses_post(
 				Ga_Helper::ga_wp_notice(
 					__(
-						'Looks like cURL is not configured on your server. In order to authenticate your Google Analytics account and display statistics, cURL is required. Please contact your server administrator to enable it, or manually enter your Tracking ID.'
+						'Looks like cURL is not configured on your server. In order to authenticate your Google Analytics account and display statistics, cURL is required. Please contact your server administrator to enable it, or manually enter your Tracking ID.', 'googleanalytics'
 					),
 					'warning'
 				)
@@ -442,7 +589,7 @@ class Ga_Admin {
 			return false;
 		}
 		if ( true === Ga_Helper::are_features_enabled() && true === Ga_Helper::is_curl_disabled() ) {
-			echo wp_kses_post( Ga_Helper::ga_wp_notice( __( 'Looks like cURL is not configured on your server. In order to authenticate your Google Analytics account and display statistics, cURL is required. Please contact your server administrator to enable it, or manually enter your Tracking ID.' ), 'warning' ) );
+			echo wp_kses_post( Ga_Helper::ga_wp_notice( __( 'Looks like cURL is not configured on your server. In order to authenticate your Google Analytics account and display statistics, cURL is required. Please contact your server administrator to enable it, or manually enter your Tracking ID.', 'googleanalytics' ), 'warning' ) );
 		}
 
 		$vendor_data = self::get_vendors();
@@ -599,8 +746,7 @@ class Ga_Admin {
 			);
 			wp_enqueue_script( GA_NAME . '-js' );
 
-			wp_register_script( 'googlecharts', 'https://www.gstatic.com/charts/loader.js', null, 1, false );
-			wp_enqueue_script( 'googlecharts' );
+			wp_enqueue_script( 'googlecharts', 'https://www.gstatic.com/charts/loader.js', null, 1, false );
 			wp_add_inline_script( GA_NAME . '-js', 'var ga_demo_nonce = "' . wp_create_nonce( 'ga_demo_nonce' ) . '";' );
 
 			if ( empty( $st_prop ) || empty( $st_secret ) ) {
@@ -689,13 +835,13 @@ class Ga_Admin {
 		$settings_updated = filter_input( INPUT_GET, 'settings-updated', FILTER_UNSAFE_RAW );
 
 		if ( false === empty( $settings_updated ) && Ga_Helper::is_plugin_page() ) {
-			echo wp_kses_post( Ga_Helper::ga_wp_notice( __( 'Settings saved' ), self::NOTICE_SUCCESS ) );
+			echo wp_kses_post( Ga_Helper::ga_wp_notice( __( 'Settings saved', 'googleanalytics' ), self::NOTICE_SUCCESS ) );
 		}
 
 		if ( true === boolval( Ga_Helper::get_option( self::GA_DISABLE_ALL_FEATURES ) ) ) {
 			echo wp_kses(
 				Ga_Helper::ga_wp_notice(
-					__( 'You have disabled all extra features, click here to enable Dashboards, Viral Alerts and Google API.' ),
+					__( 'You have disabled all extra features, click here to enable Dashboards, Viral Alerts and Google API.', 'googleanalytics' ),
 					'warning',
 					false,
 					array(
@@ -705,7 +851,7 @@ class Ga_Admin {
 								array( Ga_Controller_Core::ACTION_PARAM_NAME => 'ga_action_enable_all_features' )
 							)
 						),
-						'label' => __( 'Enable' ),
+						'label' => __( 'Enable', 'googleanalytics' ),
 					)
 				),
 				array(
@@ -762,7 +908,7 @@ class Ga_Admin {
 		if (true === Ga_Helper::is_administrator() && true === Ga_Helper::is_dashboard_page()) {
 			wp_add_dashboard_widget(
 				'ga-dashboard-widget',
-				__( 'Google Analytics Dashboard' ),
+				__( 'Google Analytics Dashboard', 'googleanalytics' ),
 				'Ga_Helper::add_ga_dashboard_widget'
 			);
 		}
@@ -829,7 +975,7 @@ class Ga_Admin {
 	 */
 	public static function ga_action_links( $actions, $plugin_file ) {
 		if ( basename( $plugin_file ) === GA_NAME . '.php' ) {
-			array_unshift( $actions, '<a href="' . esc_url( get_admin_url( null, Ga_Helper::GA_SETTINGS_PAGE_URL ) ) . '">' . __( 'Settings' ) . '</a>' );
+			array_unshift( $actions, '<a href="' . esc_url( get_admin_url( null, Ga_Helper::GA_SETTINGS_PAGE_URL ) ) . '">' . __( 'Settings', 'googleanalytics' ) . '</a>' );
 		}
 
 		return $actions;
@@ -944,7 +1090,7 @@ class Ga_Admin {
 
 			echo wp_kses_post( Ga_Helper::get_ga_dashboard_widget_data_json( sanitize_text_field( wp_unslash( $date_range ) ), sanitize_text_field( wp_unslash( $metric ) ), false, true ) );
 		} else {
-			echo wp_json_encode( array( 'error' => __( 'Invalid request.' ) ) );
+			echo wp_json_encode( array( 'error' => __( 'Invalid request.', 'googleanalytics' ) ) );
 		}
 
 		wp_die();
@@ -1248,7 +1394,7 @@ class Ga_Admin {
 		}
 
 		if (false === empty($enable_demo)) {
-			update_option('googleanalytics-ga4-demo', 'on');
+			update_option('googleanalytics-ga4-demo', '1');
 			$worked .= 'enable demo worked : ';
 		} else {
 			update_option('googleanalytics-ga4-demo', '');
@@ -1341,7 +1487,7 @@ class Ga_Admin {
 		$enabled = 'true' === filter_input( INPUT_POST, 'enabled', FILTER_UNSAFE_RAW );
 
 		update_option( 'googleanalytics_demographic', sanitize_text_field( wp_unslash( $enabled ) ) );
-		update_option( 'googleanalytics-ga4-demo', 'on' );
+		update_option( 'googleanalytics-ga4-demo', '1' );
 
 		wp_send_json_success( 'demo_on' );
 	}
@@ -1435,111 +1581,210 @@ class Ga_Admin {
 	 */
 	public function getGa4Client(): Client {
 		$client = new Client();
-		$client->setApplicationName('Google Analytics Plugin');
+		$client->setApplicationName( 'Google Analytics Plugin' );
 		$client->setScopes(
 			array( 'https://www.googleapis.com/auth/analytics.readonly' )
 		);
-		$client->setAuthConfig(GOOGLE_APPLICATION_CREDENTIALS);
-		$client->setAccessType('offline');
-		$redirect_uri = 'https://sharethis.com/google-analytics-setup/';
-		$client->setRedirectUri($redirect_uri);
-		$client->setPrompt('consent');
-		$token_info = get_option('ga4-token');
+		$client->setAccessType( 'offline' );
 
-		if (false === empty($token_info)) {
-			$access_token = json_decode($token_info, true);
-			$client->setAccessToken($access_token);
-		}
+		$token_info = get_option( 'ga4-token' );
 
-		// If there is no previous token or it's expired.
-		if ( $client->isAccessTokenExpired() ) {
-			// Refresh the token if possible, else fetch a new one.
-			if ( $client->getRefreshToken() ) {
-				$client->fetchAccessTokenWithRefreshToken( $client->getRefreshToken() );
+		if ( false === empty( $token_info ) ) {
+			$access_token = json_decode( $token_info, true );
 
-				update_option( 'ga4-token', wp_json_encode( $client->getAccessToken() ) );
-
-				$this->token = $client->getAccessToken();
-			} else {
-				// Request authorization from the user.
-				$auth_code = filter_input( INPUT_GET, 'code', FILTER_UNSAFE_RAW );
-
-				// Exchange authorization code for an access token.
-				if ( false === empty( $auth_code ) ) {
-					$access_token = $client->fetchAccessTokenWithAuthCode( sanitize_text_field( wp_unslash( $auth_code ) ) );
-					$client->setAccessToken($access_token);
-
-					// Check to see if there was an error.
-					if (array_key_exists('error', $access_token)) {
-						throw new Exception(join(', ', $access_token));
-					}
-
-					update_option('ga4-token', json_encode($client->getAccessToken()));
-				}
+			if ( is_array( $access_token ) ) {
+				$client->setAccessToken( $access_token );
 			}
 		}
 
+		/*
+		 * If there is no valid token and the site is not connected yet,
+		 * return the client as-is. The caller can use this to show the
+		 * auth/connect URL instead of throwing.
+		 */
+		if ( $client->isAccessTokenExpired() ) {
+			if ( ! $this->hasGa4BrokerConnection() ) {
+				return $client;
+			}
+
+			$fresh_token = $this->refreshGa4AccessTokenFromBroker();
+
+			if ( ! is_array( $fresh_token ) || empty( $fresh_token['access_token'] ) ) {
+				throw new Exception( esc_html__( 'Unable to refresh Google Analytics access token.', 'googleanalytics' ) );
+			}
+
+			$client->setAccessToken( $fresh_token );
+
+			update_option( 'ga4-token', wp_json_encode( $fresh_token ) );
+
+			$this->token = $fresh_token;
+		}
+
 		return $client;
+	}
+
+	private function hasGa4BrokerConnection(): bool {
+		$client_id     = (string) get_option( self::GA_SHARETHIS_PROPERTY_ID, '' );
+		$refresh_token = (string) get_option( 'sharethis_ga_refresh_token', '' );
+
+		return (
+			'' !== $client_id &&
+			'' !== $refresh_token
+		);
+	}
+
+	private function refreshGa4AccessTokenFromBroker(): array {
+		$client_id    = (string) get_option( self::GA_SHARETHIS_PROPERTY_ID, '' );
+		$refresh_token = (string) get_option( 'sharethis_ga_refresh_token', '' );
+
+		if ( '' === $client_id ) {
+			throw new Exception( esc_html__( 'Missing ShareThis installation ID.', 'googleanalytics' ) );
+		}
+
+		if ( '' === $refresh_token ) {
+			throw new Exception( esc_html__( 'Missing Google Analytics refresh token.', 'googleanalytics' ) );
+		}
+
+		$response = wp_remote_post(
+			trailingslashit( SHARETHIS_GA_BROKER_BASE ) . 'token',
+			array(
+				'timeout' => 20,
+				'headers' => array(
+					'Content-Type' => 'application/x-www-form-urlencoded',
+				),
+				'body' => array(
+					'grant_type'    => 'refresh_token',
+					'refresh_token' => $refresh_token,
+					'client_id'     => $client_id,
+				),
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			throw new Exception( esc_html( $response->get_error_message() ) );
+		}
+
+		$status_code = wp_remote_retrieve_response_code( $response );
+		$body        = wp_remote_retrieve_body( $response );
+		$data        = json_decode( $body, true );
+
+		if ( 200 !== $status_code || ! is_array( $data ) || empty( $data['access_token'] ) ) {
+			throw new Exception( esc_html__( 'Broker token refresh failed.', 'googleanalytics' ) );
+		}
+
+		return array(
+			'access_token' => sanitize_text_field( (string) $data['access_token'] ),
+			'expires_in'   => ! empty( $data['expires_in'] ) ? absint( $data['expires_in'] ) : 3600,
+			'created'      => time(),
+			'token_type'   => 'Bearer',
+		);
 	}
 
 	/**
 	 * Get the authentication info for ga4 setup.
 	 *
 	 * @return array
-	 * @throws \Google\Exception Throws exception.
+	 * @throws Exception Throws exception.
 	 */
 	public function getGa4AuthInfo() {
 		$client         = $this->getGa4Client();
 		$token_response = $client->getAccessToken();
 		$properties     = array();
 
-		if (isset($token_response['access_token'])) {
-			$args = [
-				'headers' => [
-					'Authorization' => 'Bearer ' . $token_response['access_token']
-				],
-			];
-
-			$account = wp_remote_get('https://analytics.googleapis.com/analytics/v3/management/accounts', $args);
-			$accounts = json_decode(wp_remote_retrieve_body($account), true);
-			$accounts = false === empty($accounts['items']) ? $accounts['items'] : [];
-
-			foreach($accounts as $account) {
-				if (false === empty($account['id'])) {
-					$ua_url       = 'https://www.googleapis.com/analytics/v3/management/accounts/' . $account['id'] . '/webproperties/';
-					$response_url = 'https://analyticsadmin.googleapis.com/v1alpha/properties/?filter=parent%3Aaccounts%2F' . $account['id'] . '&pageSize=1';
-					$response     = wp_remote_get( $response_url, $args );
-					$response_ua  = wp_remote_get( $ua_url, $args );
-
-					if ( false === is_array( $response ) || true === is_wp_error( $response ) ) {
-						continue;
-					}
-
-					$response_array    = json_decode( wp_remote_retrieve_body( $response ), true );
-					$ua_response_array = json_decode( wp_remote_retrieve_body( $response_ua ), true );
-
-					if ( false === empty( $ua_response_array ) && true === isset( $ua_response_array['items'] ) ) {
-						$properties_array = $ua_response_array['items'];
-					}
-
-					if ( false === empty( $response_array ) && true === isset( $response_array['properties'] ) ) {
-						$properties_array = $response_array['properties'];
-					}
-
-					if ( false === empty( $response_array ) && true === isset( $response_array['properties'] ) &&
-						false === empty( $ua_response_array ) && true === isset( $ua_response_array['items'] )
-					) {
-						$properties_array = array_merge( $response_array['properties'], $ua_response_array['items'] );
-					}
-
-					$properties[ $account['name'] ] = false === empty( $properties_array ) ? $properties_array : '';
-				}
-			}
+		/*
+		 * Not connected yet, or no usable token yet.
+		 * Return the connect URL and no properties.
+		 */
+		if ( ! is_array( $token_response ) || empty( $token_response['access_token'] ) ) {
+			return array(
+				'properties' => array(),
+				'auth_url'   => $this->getGa4ConnectUrl(),
+			);
 		}
 
-		return [
+		$args = array(
+			'headers' => array(
+				'Authorization' => 'Bearer ' . sanitize_text_field( (string) $token_response['access_token'] ),
+			),
+			'timeout' => 20,
+		);
+
+		$account_response = wp_remote_get(
+			'https://analytics.googleapis.com/analytics/v3/management/accounts',
+			$args
+		);
+
+		if ( is_wp_error( $account_response ) ) {
+			throw new Exception( esc_html( $account_response->get_error_message() ) );
+		}
+
+		$account_body = json_decode( wp_remote_retrieve_body( $account_response ), true );
+		$accounts     = array();
+
+		if ( is_array( $account_body ) && ! empty( $account_body['items'] ) && is_array( $account_body['items'] ) ) {
+			$accounts = $account_body['items'];
+		}
+
+		foreach ( $accounts as $account ) {
+			if ( empty( $account['id'] ) ) {
+				continue;
+			}
+
+			$account_id   = sanitize_text_field( (string) $account['id'] );
+			$account_name = ! empty( $account['name'] )
+				? sanitize_text_field( (string) $account['name'] )
+				: $account_id;
+
+			$properties_array = array();
+
+			$ua_url = sprintf(
+				'https://www.googleapis.com/analytics/v3/management/accounts/%s/webproperties/',
+				rawurlencode( $account_id )
+			);
+
+			$ua_response = wp_remote_get( $ua_url, $args );
+
+			if ( ! is_wp_error( $ua_response ) ) {
+				$ua_response_array = json_decode( wp_remote_retrieve_body( $ua_response ), true );
+
+				if ( is_array( $ua_response_array ) && ! empty( $ua_response_array['items'] ) && is_array( $ua_response_array['items'] ) ) {
+					$properties_array = $ua_response_array['items'];
+				}
+			}
+
+			$ga4_url = sprintf(
+				'https://analyticsadmin.googleapis.com/v1alpha/properties?filter=%s&pageSize=200',
+				rawurlencode( 'parent:accounts/' . $account_id )
+			);
+
+			$ga4_response = wp_remote_get( $ga4_url, $args );
+
+			if ( ! is_wp_error( $ga4_response ) ) {
+				$ga4_response_array = json_decode( wp_remote_retrieve_body( $ga4_response ), true );
+
+				if ( is_array( $ga4_response_array ) && ! empty( $ga4_response_array['properties'] ) && is_array( $ga4_response_array['properties'] ) ) {
+					$properties_array = array_merge( $properties_array, $ga4_response_array['properties'] );
+				}
+			}
+
+			$properties[ $account_name ] = ! empty( $properties_array ) ? $properties_array : array();
+		}
+
+		return array(
 			'properties' => $properties,
-			'auth_url'   => $client->createAuthUrl()
-		];
+			'auth_url'   => $this->getGa4ConnectUrl(),
+		);
+	}
+
+	/**
+	 * Get the local connect URL that starts the brokered OAuth flow.
+	 *
+	 * @return string
+	 */
+	private function getGa4ConnectUrl(): string {
+		return wp_nonce_url(
+			admin_url( 'admin-post.php?action=sharethis_ga_connect' ),
+			'sharethis_ga_connect'
+		);
 	}
 }

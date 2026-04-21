@@ -1,6 +1,8 @@
 <?php
 // phpcs:ignoreFile
 
+if (!defined('ABSPATH')) exit;
+
 /**
  * Page view.
  *
@@ -46,14 +48,14 @@ $setup_done = false !== $has_property &&
 				<div class="ga-modal-header">
 					<span id="ga_close" class="ga-close">&times;</span>
 					<h4 class="ga-modal-title">
-						<?php esc_html_e( 'Please paste the access code obtained from Google below:' ); ?>
+						<?php esc_html_e( 'Please paste the access code obtained from Google below:', 'googleanalytics' ); ?>
 					</h4>
 				</div>
 				<div class="ga-modal-body">
 					<div id="ga_code_error" class="ga-alert ga-alert-danger" style="display: none;"></div>
-					<label for="ga_access_code"><strong><?php esc_html_e( 'Access Code' ); ?></strong>:</label>
+					<label for="ga_access_code"><strong><?php esc_html_e( 'Access Code', 'googleanalytics' ); ?></strong>:</label>
 					&nbsp;<input id="ga_access_code_tmp" type="text"
-								 placeholder="<?php esc_html_e( 'Paste your access code here' ); ?>"/>
+								 placeholder="<?php esc_html_e( 'Paste your access code here', 'googleanalytics' ); ?>"/>
 					<div class="ga-loader-wrapper">
 						<div class="ga-loader"></div>
 					</div>

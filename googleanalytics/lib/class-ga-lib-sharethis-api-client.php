@@ -69,7 +69,7 @@ class Ga_Lib_Sharethis_Api_Client extends Ga_Lib_Api_Client {
 					return call_user_func( $callback );
 				}
 			} catch ( Ga_Lib_Api_Request_Exception $e ) {
-				throw new Ga_Lib_Sharethis_Api_Client_Exception( $e->getMessage() );
+				throw new Ga_Lib_Sharethis_Api_Client_Exception( esc_html($e->getMessage()) );
 			}
 		} else {
 			throw new Ga_Lib_Sharethis_Api_Client_Exception( wp_json_encode( array( 'error' => '[' . get_class( $this ) . ']Unknown method: ' . $callback ) ) );
@@ -93,7 +93,7 @@ class Ga_Lib_Sharethis_Api_Client extends Ga_Lib_Api_Client {
 				true
 			);
 		} catch ( Ga_Lib_Api_Request_Exception $e ) {
-			throw new Ga_Lib_Sharethis_Api_Client_InvalidDomain_Exception( $e->getMessage() );
+			throw new Ga_Lib_Sharethis_Api_Client_InvalidDomain_Exception( esc_html($e->getMessage()) );
 		}
 
 		return new Ga_Lib_Api_Response( $response );
@@ -112,7 +112,7 @@ class Ga_Lib_Sharethis_Api_Client extends Ga_Lib_Api_Client {
 		try {
 			$response = $request->make_request( 'https://' . self::GA_SHARETHIS_ENDPOINT . '/verify', wp_json_encode( $query_params ), true );
 		} catch ( Ga_Lib_Api_Request_Exception $e ) {
-			throw new Ga_Lib_Sharethis_Api_Client_Verify_Exception( $e->getMessage() );
+			throw new Ga_Lib_Sharethis_Api_Client_Verify_Exception( esc_html($e->getMessage()) );
 		}
 
 		return new Ga_Lib_Api_Response( $response );
@@ -131,7 +131,7 @@ class Ga_Lib_Sharethis_Api_Client extends Ga_Lib_Api_Client {
 		try {
 			$response = $request->make_request( 'https://' . self::GA_SHARETHIS_ENDPOINT . '/user/join', wp_json_encode( $query_params ), true );
 		} catch ( Ga_Lib_Api_Request_Exception $e ) {
-			throw new Ga_Lib_Sharethis_Api_Client_Invite_Exception( $e->getMessage() );
+			throw new Ga_Lib_Sharethis_Api_Client_Invite_Exception( esc_html($e->getMessage()) );
 		}
 
 		return new Ga_Lib_Api_Response( $response );

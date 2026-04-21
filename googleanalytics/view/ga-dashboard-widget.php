@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 $ga_nonce            = isset( $ga_nonce ) ? $ga_nonce : '';
 $more_details_url    = isset( $more_details_url ) ? $more_details_url : '#';
 $show_trigger_button = isset( $show_trigger_button ) ? $show_trigger_button : false;
@@ -72,7 +74,7 @@ $show_trigger_button = isset( $show_trigger_button ) ? $show_trigger_button : fa
 	<?php
 	echo wp_kses_post(
 		sprintf(
-			'<a href="%s">' . __( 'Show more details' ) . '</a>',
+			'<a href="%s">' . __( 'Show more details', 'googleanalytics' ) . '</a>',
 			esc_url( $more_details_url )
 		)
 	);

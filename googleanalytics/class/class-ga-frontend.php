@@ -5,6 +5,9 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
+
 /**
  * Frontend.
  */

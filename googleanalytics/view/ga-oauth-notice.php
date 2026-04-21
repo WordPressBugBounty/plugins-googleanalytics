@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 $msg = isset( $msg ) ? $msg : '';
 ?>
 <div class="ga-alert ga-alert-warning">

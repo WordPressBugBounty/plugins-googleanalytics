@@ -5,6 +5,7 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
 ?>
 <div class="vendor-exclusion">
 	<div class="vendor-table">

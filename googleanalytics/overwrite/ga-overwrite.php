@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 if ( false === function_exists( 'wp_json_encode' ) ) {
 	/**
 	 * Encode a variable into JSON.

@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 ?>
 <div class="col-md-12">
 	<h3><?php echo esc_html__( 'Form Color', 'googleanalytics' ); ?></h3>

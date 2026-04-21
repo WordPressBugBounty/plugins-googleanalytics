@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 /**
  * Helper class.
  */
@@ -338,7 +340,7 @@ class Ga_Helper {
 	public static function get_chart_page( $view, $params ) {
 		$message = sprintf(
 		/* translators: %s is the settings page URL. */
-			__( 'Statistics can only be seen after you authenticate with your Google account on the <a href="%s">Settings page</a>.' ),
+			__( 'Statistics can only be seen after you authenticate with your Google account on the <a href="%s">Settings page</a>.', 'googleanalytics' ),
 			admin_url( self::GA_SETTINGS_PAGE_URL )
 		);
 		$ga4_property = get_option('googleanalytics-ga4-property');

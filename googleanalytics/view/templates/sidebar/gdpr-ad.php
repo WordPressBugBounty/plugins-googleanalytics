@@ -5,6 +5,7 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
 ?>
 <div class="sidebar-ad">
 	<div id="gdpr-ad">

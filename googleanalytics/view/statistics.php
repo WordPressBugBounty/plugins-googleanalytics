@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 $data = isset( $data ) ? $data : '';
 ?>
 <div class="wrap ga-wrap">
@@ -77,7 +79,7 @@ $data = isset( $data ) ? $data : '';
 					);
 					?>
 				</a>
-				<p><div id="close-review-us"><?php esc_html_e( 'close' ); ?></div></p>
+				<p><div id="close-review-us"><?php esc_html_e( 'close', 'googleanalytics' ); ?></div></p>
 			</h3>
 		</div>
 	<?php endif; ?>

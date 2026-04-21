@@ -5,6 +5,7 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
 ?>
 <div class="sidebar-ad">
 	<div id="demo-ad">
@@ -57,12 +58,12 @@
 		<div class="row register-section">
 			<?php if ( true === Ga_Helper::are_features_enabled() ) : ?>
 				<td>
-					<button id="demographic-popup"><?php esc_html_e( 'Enable' ); ?></button>
+					<button id="demographic-popup"><?php esc_html_e( 'Enable', 'googleanalytics' ); ?></button>
 				</td>
 			<?php else : ?>
 				<td>
 					<label class="<?php echo esc_attr( false === Ga_Helper::are_features_enabled() ? 'label-grey ga-tooltip' : '' ); ?>">
-						<button class="gdpr-enable" disabled="disabled"><?php esc_html_e( 'Enable' ); ?></button>
+						<button class="gdpr-enable" disabled="disabled"><?php esc_html_e( 'Enable', 'googleanalytics' ); ?></button>
 						<span class="ga-tooltiptext ga-tt-abs"><?php echo esc_html( $tooltip ); ?></span>
 					</label>
 				</td>

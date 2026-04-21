@@ -5,6 +5,8 @@
  * @package GoogleAnalytics
  */
 
+if (!defined('ABSPATH')) exit;
+
 ?>
 <div class="wrap ga-wrap">
 	<h3 class="ga-trending-h3">Google Analytics</h3>
@@ -111,7 +113,7 @@ Enter your email and we\'ll send you an invite',
 								<?php echo disabled( false === Ga_Helper::are_features_enabled() ); ?>
 								placeholder="Your email address">
 							<button <?php echo disabled( false === Ga_Helper::are_features_enabled() ); ?>
-									type="submit" class="button button-primary"><?php echo esc_html__( 'Send' ); ?></button>
+									type="submit" class="button button-primary"><?php echo esc_html__( 'Send', 'googleanalytics' ); ?></button>
 						</td>
 					</tr>
 				</table>
