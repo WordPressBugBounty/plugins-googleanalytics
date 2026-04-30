@@ -44,7 +44,7 @@ class GA_OAuth {
 			trailingslashit( SHARETHIS_GA_BROKER_BASE ). 'authorize'
 		);
 
-		wp_safe_redirect( $broker_url );
+		wp_redirect( $broker_url );
 		exit;
 	}
 
