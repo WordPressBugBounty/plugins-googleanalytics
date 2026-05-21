@@ -2,10 +2,10 @@
 Contributors: sharethis, scottstorebloom, scottmweaver
 Tags: analytics, google analytics, google analytics plugin, google analytics widget, google analytics dashboard
 Requires at least: 5.5
-Tested up to: 6.9
-Stable tag: 3.3.1
+Tested up to: 7.0
+Stable tag: 3.3.2
 License: GPLv2 or later
-Version: 3.3.1
+Version: 3.3.2
 
 Use Google Analytics on your WordPress site without touching any code, and view visitor reports right in your WordPress admin dashboard!
 
@@ -142,6 +142,9 @@ Google has already switched to supporting Google Analytics 4. However, you can s
 7. UA and GA4 tabs for settings
 
 == Changelog ==
+
+= 3.3.2 =
+* WP ver test.
 
 = 3.3.1 =
 * Fix redirect issue for signin.
