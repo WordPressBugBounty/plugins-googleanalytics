@@ -148,7 +148,7 @@ const GA_AUTHENTICATION_CODE_ERROR = 'That looks like your Google Analytics Trac
 					}
 
 					if ( propertySelection ) {
-						if ( 'Choose Property' === propertySelection.value ) {
+						if ( '' === propertySelection.value ) {
 							const propErrorMessage = document.createElement( 'small' );
 							propErrorMessage.className = 'error prop-error';
 							propErrorMessage.textContent = '*You must select a property to continue';
@@ -159,7 +159,6 @@ const GA_AUTHENTICATION_CODE_ERROR = 'That looks like your Google Analytics Trac
 							dataObj['action'] = "save_ga4_property_selection";
 							dataObj['nonce'] = GA_NONCE;
 							dataObj['property'] = propertySelection.value;
-							dataObj['view_id'] = propertySelection.item(propertySelection.selectedIndex).getAttribute( 'data-view-id' );
 
 							$.ajax(
 								{
@@ -261,20 +260,19 @@ const GA_AUTHENTICATION_CODE_ERROR = 'That looks like your Google Analytics Trac
 			document.addEventListener( 'submit', () => {
 				const propSelect = document.getElementById( 'ga_account_selector' );
 
-				if ( propSelect ) {
-					const viewIdDataObj = {};
-					const viewID = propSelect.item( propSelect.selectedIndex ).getAttribute( 'data-view-id' );
+				if ( propSelect && '' !== propSelect.value ) {
+					const propertyDataObj = {};
 
-					viewIdDataObj['action'] = "save_view_id";
-					viewIdDataObj['nonce'] = GA_NONCE;
-					viewIdDataObj['view_id'] = viewID;
+					propertyDataObj['action'] = "save_ga4_property_selection";
+					propertyDataObj['nonce'] = GA_NONCE;
+					propertyDataObj['property'] = propSelect.value;
 
 					$.ajax(
 						{
 							type: "post",
 							dataType: "json",
 							url: ajaxurl,
-							data: viewIdDataObj
+							data: propertyDataObj
 						},
 					);
 				}

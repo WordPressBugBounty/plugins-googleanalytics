@@ -168,6 +168,16 @@ class Ga_Admin {
 				Ga_Helper::update_option( self::GA_WEB_PROPERTY_ID_MANUALLY_OPTION_NAME, 1 );
 				delete_option( 'web_property_id' );
 			}
+
+			/*
+			 * Universal Analytics is retired. Installs that already have a GA4
+			 * property selected but still carry a legacy UA view ID stay stuck
+			 * in UA-mode gating (which requires an empty view ID). Clear the
+			 * stale view ID once so those installs flip to GA4 automatically.
+			 */
+			if ( ! empty( get_option( 'googleanalytics-ga4-property' ) ) && ! empty( get_option( 'googleanalytics-view-id' ) ) ) {
+				update_option( 'googleanalytics-view-id', '' );
+			}
 		}
 
 		update_option( self::GA_VERSION_OPTION_NAME, GOOGLEANALYTICS_VERSION );
@@ -365,7 +375,7 @@ class Ga_Admin {
 			'googleanalytics-ga4-property',
 			array(
 				'type'              => 'string',
-				'sanitize_callback' => 'sanitize_text_field',
+				'sanitize_callback' => 'Ga_Admin::sanitize_ga4_property',
 			)
 		);
 
@@ -926,7 +936,6 @@ class Ga_Admin {
 		add_action( 'wp_ajax_ga_ajax_hide_review', 'Ga_Admin::ga_ajax_hide_review' );
 		add_action( 'wp_ajax_save_ga4_property_selection', 'Ga_Admin::save_ga4_property_selection' );
 		add_action( 'wp_ajax_save_ga4_final_setup', 'Ga_Admin::save_ga4_final_setup' );
-		add_action( 'wp_ajax_save_view_id', 'Ga_Admin::save_view_id' );
 		add_action( 'wp_ajax_ga_ajax_enable_gdpr', 'Ga_Admin::ga_ajax_gdpr_enable' );
 		add_action( 'wp_ajax_ga_ajax_enable_demographic', 'Ga_Admin::ga_ajax_enable_demo' );
 		add_action( 'wp_ajax_ga_ajax_sign_out', 'Ga_Admin::ga_ajax_sign_out' );
@@ -1340,20 +1349,37 @@ class Ga_Admin {
 			wp_send_json_error( 'user not authorized' );
 		};
 
-		$property = filter_input( INPUT_POST, 'property', FILTER_UNSAFE_RAW );
-		$view_id  = filter_input( INPUT_POST, 'view_id', FILTER_UNSAFE_RAW );
+		$property = self::sanitize_ga4_property( wp_unslash( filter_input( INPUT_POST, 'property', FILTER_UNSAFE_RAW ) ) );
 
-		if ( false === empty( $view_id ) ) {
-			update_option( 'googleanalytics-view-id', sanitize_text_field( wp_unslash( $view_id ) ) );
+		if ( '' === $property ) {
+			wp_send_json_error( 'property not saved' );
 		}
 
-		if ( false === empty( $property ) ) {
-			update_option( 'googleanalytics-ga4-property', sanitize_text_field( wp_unslash( $property ) ) );
+		update_option( 'googleanalytics-ga4-property', $property );
 
-			wp_send_json_success( $property );
-		}
+		// Selecting a GA4 property clears any legacy UA view ID so GA4-mode
+		// gating (which requires an empty view ID) engages for installs that
+		// were previously on Universal Analytics.
+		update_option( 'googleanalytics-view-id', '' );
 
-		wp_send_json_error( 'property not saved' );
+		wp_send_json_success( $property );
+	}
+
+	/**
+	 * Validate a GA4 property resource name.
+	 *
+	 * GA4 properties are identified as "properties/<numeric id>". Anything that
+	 * does not match (empty selection, placeholder text, legacy UA values) is
+	 * rejected so it can never reach the reporting API.
+	 *
+	 * @param mixed $value Raw property value.
+	 *
+	 * @return string The valid property resource name, or an empty string.
+	 */
+	public static function sanitize_ga4_property( $value ) {
+		$value = sanitize_text_field( (string) $value );
+
+		return 1 === preg_match( '#^properties/\d+$#', $value ) ? $value : '';
 	}
 
 	/**
@@ -1419,25 +1445,6 @@ class Ga_Admin {
 		}
 
 		wp_send_json_error('final setup not saved');
-	}
-
-	/**
-	 * Ajax save viewID.
-	 *
-	 * @return void
-	 */
-	public static function save_view_id() {
-		if ( check_ajax_referer( 'ga4-setup', 'nonce' ) && false === current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( 'user not authorized' );
-		}
-
-		$view_id = filter_input( INPUT_POST, 'view_id', FILTER_UNSAFE_RAW );
-
-		if ( false === empty( $view_id ) ) {
-			update_option( 'googleanalytics-view-id', sanitize_text_field( wp_unslash( $view_id ) ) );
-		} else {
-			update_option( 'googleanalytics-view-id', '' );
-		}
 	}
 
 	/**
@@ -1709,66 +1716,100 @@ class Ga_Admin {
 			'timeout' => 20,
 		);
 
-		$account_response = wp_remote_get(
-			'https://analytics.googleapis.com/analytics/v3/management/accounts',
-			$args
-		);
+		/*
+		 * Enumerate accounts and their GA4 properties in a single call via the
+		 * GA4 Admin API. accountSummaries returns each account along with its
+		 * propertySummaries, so there is no dependency on the retired
+		 * Universal Analytics Management API (which returns nothing for
+		 * GA4-only accounts).
+		 */
+		$page_token = '';
 
-		if ( is_wp_error( $account_response ) ) {
-			throw new Exception( esc_html( $account_response->get_error_message() ) );
-		}
+		do {
+			$summaries_url = 'https://analyticsadmin.googleapis.com/v1beta/accountSummaries?pageSize=200';
 
-		$account_body = json_decode( wp_remote_retrieve_body( $account_response ), true );
-		$accounts     = array();
-
-		if ( is_array( $account_body ) && ! empty( $account_body['items'] ) && is_array( $account_body['items'] ) ) {
-			$accounts = $account_body['items'];
-		}
-
-		foreach ( $accounts as $account ) {
-			if ( empty( $account['id'] ) ) {
-				continue;
+			if ( '' !== $page_token ) {
+				$summaries_url .= '&pageToken=' . rawurlencode( $page_token );
 			}
 
-			$account_id   = sanitize_text_field( (string) $account['id'] );
-			$account_name = ! empty( $account['name'] )
-				? sanitize_text_field( (string) $account['name'] )
-				: $account_id;
+			$account_response = wp_remote_get( $summaries_url, $args );
 
-			$properties_array = array();
+			if ( is_wp_error( $account_response ) ) {
+				return array(
+					'properties' => array(),
+					'auth_url'   => $this->getGa4ConnectUrl(),
+					'error'      => $account_response->get_error_message(),
+				);
+			}
 
-			$ua_url = sprintf(
-				'https://www.googleapis.com/analytics/v3/management/accounts/%s/webproperties/',
-				rawurlencode( $account_id )
-			);
+			$status_code = (int) wp_remote_retrieve_response_code( $account_response );
+			$account_body = json_decode( wp_remote_retrieve_body( $account_response ), true );
 
-			$ua_response = wp_remote_get( $ua_url, $args );
+			/*
+			 * Surface API failures (expired/revoked token, missing scope, quota)
+			 * instead of returning an empty list, which is indistinguishable from
+			 * "this account has no properties".
+			 */
+			if ( 200 !== $status_code ) {
+				$api_message = is_array( $account_body ) && ! empty( $account_body['error']['message'] )
+					? (string) $account_body['error']['message']
+					: __( 'Google Analytics returned an unexpected response. Please sign out and reconnect your account.', 'googleanalytics' );
 
-			if ( ! is_wp_error( $ua_response ) ) {
-				$ua_response_array = json_decode( wp_remote_retrieve_body( $ua_response ), true );
+				return array(
+					'properties' => array(),
+					'auth_url'   => $this->getGa4ConnectUrl(),
+					'error'      => $api_message,
+				);
+			}
 
-				if ( is_array( $ua_response_array ) && ! empty( $ua_response_array['items'] ) && is_array( $ua_response_array['items'] ) ) {
-					$properties_array = $ua_response_array['items'];
+			if ( ! is_array( $account_body ) ) {
+				break;
+			}
+
+			$account_summaries = ! empty( $account_body['accountSummaries'] ) && is_array( $account_body['accountSummaries'] )
+				? $account_body['accountSummaries']
+				: array();
+
+			foreach ( $account_summaries as $account ) {
+				// Key by the unique account resource name so two accounts that
+				// share a display name do not overwrite each other.
+				$account_key = ! empty( $account['account'] ) ? sanitize_text_field( (string) $account['account'] ) : '';
+
+				if ( '' === $account_key ) {
+					continue;
 				}
-			}
 
-			$ga4_url = sprintf(
-				'https://analyticsadmin.googleapis.com/v1alpha/properties?filter=%s&pageSize=200',
-				rawurlencode( 'parent:accounts/' . $account_id )
-			);
+				$account_label = ! empty( $account['displayName'] )
+					? sanitize_text_field( (string) $account['displayName'] )
+					: $account_key;
 
-			$ga4_response = wp_remote_get( $ga4_url, $args );
+				$properties_array = array();
 
-			if ( ! is_wp_error( $ga4_response ) ) {
-				$ga4_response_array = json_decode( wp_remote_retrieve_body( $ga4_response ), true );
+				if ( ! empty( $account['propertySummaries'] ) && is_array( $account['propertySummaries'] ) ) {
+					foreach ( $account['propertySummaries'] as $property_summary ) {
+						if ( empty( $property_summary['property'] ) ) {
+							continue;
+						}
 
-				if ( is_array( $ga4_response_array ) && ! empty( $ga4_response_array['properties'] ) && is_array( $ga4_response_array['properties'] ) ) {
-					$properties_array = array_merge( $properties_array, $ga4_response_array['properties'] );
+						$properties_array[] = array(
+							'name'        => sanitize_text_field( (string) $property_summary['property'] ),
+							'displayName' => ! empty( $property_summary['displayName'] )
+								? sanitize_text_field( (string) $property_summary['displayName'] )
+								: sanitize_text_field( (string) $property_summary['property'] ),
+						);
+					}
 				}
+
+				$properties[ $account_key ] = array(
+					'label'      => $account_label,
+					'properties' => $properties_array,
+				);
 			}
 
-			$properties[ $account_name ] = ! empty( $properties_array ) ? $properties_array : array();
-		}
+			$page_token = ! empty( $account_body['nextPageToken'] )
+				? sanitize_text_field( (string) $account_body['nextPageToken'] )
+				: '';
+		} while ( '' !== $page_token );
 
 		return array(
 			'properties' => $properties,

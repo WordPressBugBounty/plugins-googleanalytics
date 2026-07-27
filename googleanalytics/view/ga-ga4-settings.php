@@ -6,6 +6,11 @@ $ga_admin          = new Ga_Admin();
 $auth_info         = $ga_admin->getGa4AuthInfo();
 $oauth             = new GA_OAuth();
 ?>
+<?php if ( false === empty( $auth_info['error'] ) ) : ?>
+	<div class="notice notice-error">
+		<p><?php echo esc_html( $auth_info['error'] ); ?></p>
+	</div>
+<?php endif; ?>
 <script type="text/javascript">
 	const GA_NONCE = '<?php echo esc_js( $ga_nonce ); ?>';
 	const GA_NONCE_FIELD = 'ga4-setup';
@@ -31,23 +36,16 @@ $oauth             = new GA_OAuth();
 		<p>Choose the view you want to use for your reports.</p>
 		<label for="ga4-property">
 			<select id="ga4-property">
-				<option>Choose Property</option>
+				<option value="">Choose Property</option>
 				<?php
-				foreach ( $auth_info['properties'] as $account => $properties ) :
-					if ( false === empty( $properties ) ) :
+				foreach ( $auth_info['properties'] as $account_data ) :
+					if ( false === empty( $account_data['properties'] ) ) :
 						?>
-					<option disabled><?php echo esc_html( $account ); ?>:</option>
+					<option disabled><?php echo esc_html( $account_data['label'] ); ?>:</option>
 						<?php
-						foreach ( $properties as $property ) :
-							// Only add UA properties with default profile IDs.
-							if ( true === isset( $property['id'] ) &&
-								false !== strpos( $property['id'], 'UA-' ) &&
-								false === isset( $property['defaultProfileId'] )
-							) {
-								continue;
-							}
+						foreach ( $account_data['properties'] as $property ) :
 							?>
-						<option data-view-id="<?php echo isset( $property['defaultProfileId'] ) ? esc_attr( $property['defaultProfileId'] ) : ''; ?>" value="<?php echo isset( $property['defaultProfileId'] ) ? 'properties/' . esc_attr( $property['internalWebPropertyId'] ) : esc_attr( $property['name'] ); ?>">
+						<option value="<?php echo esc_attr( $property['name'] ); ?>">
 							<?php echo isset( $property['displayName'] ) ? esc_html( $property['displayName'] ) : esc_html( $property['name'] ); ?>
 						</option>
 							<?php
@@ -166,25 +164,17 @@ $oauth             = new GA_OAuth();
 				<tr>
 					<td>
 						<select id="ga_account_selector" name="googleanalytics-ga4-property">
-							<option>Please select your Google Analytics account:</option>
+							<option value="">Please select your Google Analytics account:</option>
 							<?php
-							foreach ( $auth_info['properties'] as $account => $properties ) :
-								if ( false === empty( $properties ) ) :
+							foreach ( $auth_info['properties'] as $account_data ) :
+								if ( false === empty( $account_data['properties'] ) ) :
 									?>
-									<option disabled><?php echo esc_html( $account ); ?>:</option>
+									<option disabled><?php echo esc_html( $account_data['label'] ); ?>:</option>
 									<?php
-									foreach ( $properties as $property ) :
-										// Only add UA properties with default profile IDs.
-										if ( true === isset( $property['id'] ) &&
-											false !== strpos( $property['id'], 'UA-' ) &&
-											false === isset( $property['defaultProfileId'] )
-										) {
-											continue;
-										}
-
-										$property_name = isset( $property['defaultProfileId'] ) ? 'properties/' . esc_attr( $property['internalWebPropertyId'] ) : esc_attr( $property['name'] );
+									foreach ( $account_data['properties'] as $property ) :
+										$property_name = $property['name'];
 										?>
-										<option data-view-id="<?php echo isset( $property['defaultProfileId'] ) ? esc_attr( $property['defaultProfileId'] ) : ''; ?>" value="<?php echo esc_attr( $property_name ); ?>" <?php echo $property_name === $has_property ? 'selected' : ''; ?>>
+										<option value="<?php echo esc_attr( $property_name ); ?>" <?php selected( $property_name, $has_property ); ?>>
 											<?php echo isset( $property['displayName'] ) ? esc_html( $property['displayName'] ) : esc_html( $property['name'] ); ?>
 										</option>
 										<?php

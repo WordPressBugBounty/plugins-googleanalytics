@@ -3,9 +3,9 @@ Contributors: sharethis, scottstorebloom, scottmweaver
 Tags: analytics, google analytics, google analytics plugin, google analytics widget, google analytics dashboard
 Requires at least: 5.5
 Tested up to: 7.0
-Stable tag: 3.3.2
+Stable tag: 3.4.0
 License: GPLv2 or later
-Version: 3.3.2
+Version: 3.4.0
 
 Use Google Analytics on your WordPress site without touching any code, and view visitor reports right in your WordPress admin dashboard!
 
@@ -19,7 +19,7 @@ Unlike other plugins, there are no monthly fees or paid upgrades for this plugin
 
 Get started in less than 10 minutes. Installation is quick and easy, no developers required.
 
-Simply download the plugin, log into Google, select the required website, and it will automatically include the appropriate code. This plugin is compatible with both Universal Analytics and Google Analytics 4 (GA4).
+Simply download the plugin, log into Google, select your Google Analytics 4 (GA4) property, and it will automatically include the appropriate tracking code for you.
 
 **GOOGLE ANALYTICS DASHBOARD**
 
@@ -89,8 +89,8 @@ While some publishers prefer the manual option, installing the Google Analytics 
 
 = Do I Need to Put Google Analytics Tracking Code on Every Page? =
 Google Analytics tracking code is a block of JavaScript code that executes Google Analytics tracking when a visitor loads a page on your website. The script that triggers these events must be loaded on every page in order for Google Analytics tracking to work.
-That doesn't mean you need to become an expert in JavaScript code or spend hours manually inserting Google Analytics tracking code on every page of your WordPress website. You can insert the tracking code in your header.php file so that it automatically loads on every page, or you can install the Google Analytics Dashboard for WordPress plugin and follow a few simple steps to get Google Analytics tracking setup in minutes by authenticating with Google.
-Even if you prefer the traditional manual option of adding the UA tracking code to every page, the Google Analytics Dashboard for WordPress plugin makes that process easier, too. Simply click “Manually enter Tracking ID” and paste your Google Tracking code into the box that appears. Then, just click “Save Changes,” and your code will instantly be live on all your pages.  Click here for more details on this process. However, keep in mind that using this option means your dashboards won’t appear, so to get the most from the Google Analytics Dashboard for WordPress plugin, we recommend using the authenticate with Google setup option from our latest update.
+That doesn't mean you need to become an expert in JavaScript code or spend hours manually inserting Google Analytics tracking code on every page of your WordPress website. You can insert the tracking code in your header.php file so that it automatically loads on every page, or you can install the Google Analytics Dashboard for WordPress plugin and follow a few simple steps to get GA4 tracking setup in minutes by authenticating with Google.
+Even if you prefer the traditional manual option of adding tracking code to every page, the Google Analytics Dashboard for WordPress plugin makes that process easier, too. Simply click “Manually enter Measurement ID” and paste your GA4 Measurement ID (G-XXXXXXX) into the box that appears. Then, just click “Save Changes,” and your code will instantly be live on all your pages. However, keep in mind that using this option means your dashboards won’t appear, so to get the most from the Google Analytics Dashboard for WordPress plugin, we recommend using the authenticate with Google setup option.
 
 = How Do I Use Google Analytics for SEO? =
 There are many ways to leverage Google Analytics to improve your WordPress website’s SEO. SEO, or search engine optimization, is the practice of tracking and analyzing website data to improve organic traffic. But tracking traffic and other website metrics alone doesn’t magically improve your SEO. Here are a few ways to leverage all the valuable Google Analytics data to improve your WordPress website’s SEO, start improving your search engine rankings, and growing your website traffic organically:
@@ -107,41 +107,35 @@ When the General Data Protection Regulation (GDPR) was first introduced, website
 Fortunately, a number of useful compliance tools emerged to make compliance easier for publishers and businesses of all sizes. Consent Management Platforms (CMPs) are tools designed to inform visitors about the data a website or third-party tool is collecting about them and how that data will be used, provide an opt-in option for users to grant consent to have their data collected (as well as an opt-out option to decline), and communicate the consent status of users and cookies to other vendors operating within the IAB Framework. CMPs also offer transparency to users, providing granular information on the companies their data will be shared with and allowing them to monitor and control who receives their data. Finally, CMPs provide a centralized database for users to review the most up-to-date privacy policies and information related to their data collection.
 If you’re using Google Analytics on your WordPress website or a plugin like the Google Analytics Dashboard for WordPress, you must comply with GDPR. A CMP is the best way to manage the consent process for GDPR compliance. With ShareThis’ GDPR Compliance Tool built right in to the Google Analytics Dashboard for WordPress plugin, you can easily stay on top of getting consent to collect your visitors’ data and provide visitors with clear and valuable information. Our GDPR Compliance Tool is compliant with the IAB’s Transparency & Consent Framework v2.0, meaning it meets the latest standards for transparency in data collection and consent management. Check out our GDPR checklist for publishers & website owners to make sure you’re meeting the requirements or download our GDPR Compliance Guide for detailed information on GDPR compliance with ShareThis’ tools.
 
-= What is Universal Analytics? =
-Universal Analytics is Google’s legacy Google Analytics. The code line will normally look like so: UA-XXXXXXX. This is the product that we have been using on your behalf to collect data for your Google Analytics.
+= What is GA4? =
+Google Analytics 4 (GA4) is the current version of Google’s analytics platform and the only version supported going forward. GA4 property IDs look like G-XXXXXXX. GA4 lets you track both websites and apps under one account, adds many new reporting features, and provides deeper insights into how users interact with your content. Our plugin connects directly to your GA4 property so you can view these insights right inside your WordPress dashboard.
 
-= What is GA4 =
-Google Analytics 4 (GA4) is the latest update from Google Analytic’s platform. GA4's biggest update is allowing you to track both websites and apps under one account. There are also many new reporting features and it provides deeper insights into how users interact with your content.
+= How do I set up GA4 with this plugin? =
+Setting up a GA4 property is quick and easy. Once you’ve installed the plugin, authenticate with Google through your WordPress admin, and select your GA4 property from the dropdown. The plugin adds the correct GA4 tracking code to your site automatically and starts surfacing your dashboards. If you don’t have a GA4 property yet, you can create one for free in your Google Analytics account and connect it in just a few clicks.
 
-On the back end, the way data is maintained is a little bit different, which will ultimately provide all of us new ways to track, measure and eventually analyze traffic.
-
-= Do I have to use GA4? =
-In theory, you don’t have to set up GA4 if you do not want to.
-Our ShareThis Google Analytics plugin will continue working with UA and support it as long as possible. However, like all new products that are brought to market, Google will only release new features that support GA4 moving forward.
-We highly suggest setting up a GA4 property even if you do not plan on using it for the moment. That way, when you do decide to make the cross over, you’ll have access to historical data as soon as possible.
-
-Our plugin will collect data at the same time for UA and GA4. Setting up a GA4 property is very easy and we provide the ability to connect through your Wordpress admin section.
-
-= What happens to my data? =
-Nothing will happen to your existing data! Your UA property will be kept as is.
-If you do decide to start using GA4, a new property will be created in Google Analytics. As with all new properties, it means there won’t be any data (you start from scratch).
-
-Luckily we’ve allowed you to use both UA and GA4 properties and view both analytics on the same dashboard.
-
-= When will Google switch to GA4? =
-Google has already switched to supporting Google Analytics 4. However, you can still use your UA code and it will continue to collect data.
+= I was using Universal Analytics before — what do I do now? =
+Universal Analytics (UA-XXXXXXX properties) has been fully retired by Google and no longer collects or processes data. To keep tracking your site, connect a GA4 property using the setup steps above. Your historical Universal Analytics data remains in your Google Analytics account for as long as Google makes it available, but all new tracking and reporting in this plugin runs entirely on GA4.
 
 == Screenshots ==
 
 1. Overall site performance - the past 7/30 days
 2. The top 10 page views for the past 7/30 days
-3. Directly authenticate Google Analytics, and exclude sets of logged in users
-4. Just click to authenticate, then copy the API key and add it to the plugin
+3. Click “Sign in with Google” to get started connecting your Google Analytics account
+4. Choose your GA4 property from the property selector step
 5. GA4 dashboard graphs
 6. GA4 Top 10 pages and new users by page view
-7. UA and GA4 tabs for settings
+7. GA4 settings page
 
 == Changelog ==
+
+= 3.4.0 =
+* Fix empty property list on sign in by fetching accounts and GA4 properties directly from the Google Analytics Admin API (accountSummaries) instead of the retired Universal Analytics Management API.
+* Save the selected GA4 property correctly from the settings page property selector.
+* Surface Google Analytics API errors (expired token, missing scope) on the settings page instead of showing an empty property list.
+* Validate the GA4 property format before saving so invalid selections can't reach the reporting API.
+* Automatically clear stale Universal Analytics view IDs on upgrade for installs already using GA4.
+* Remove legacy Universal Analytics logic from property discovery and the settings UI.
+* Update readme and FAQs to focus on GA4.
 
 = 3.3.2 =
 * WP ver test.
