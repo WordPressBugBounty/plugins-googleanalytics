@@ -2,10 +2,10 @@
 Contributors: sharethis, scottstorebloom, scottmweaver
 Tags: analytics, google analytics, google analytics plugin, google analytics widget, google analytics dashboard
 Requires at least: 5.5
-Tested up to: 7.0
-Stable tag: 3.4.0
+Tested up to: 7.1
+Stable tag: 3.4.1
 License: GPLv2 or later
-Version: 3.4.0
+Version: 3.4.1
 
 Use Google Analytics on your WordPress site without touching any code, and view visitor reports right in your WordPress admin dashboard!
 
@@ -127,6 +127,9 @@ Universal Analytics (UA-XXXXXXX properties) has been fully retired by Google and
 7. GA4 settings page
 
 == Changelog ==
+
+= 3.4.1 =
+* Tested in wp 7.1
 
 = 3.4.0 =
 * Fix empty property list on sign in by fetching accounts and GA4 properties directly from the Google Analytics Admin API (accountSummaries) instead of the retired Universal Analytics Management API.
